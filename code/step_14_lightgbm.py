@@ -1,3 +1,10 @@
+"""Step 14: LightGBM as a comparator model.
+
+Hyperparameters are tuned with Optuna (TPE sampler) to maximise mean AUPRC in
+patient-level cross-validation on the training set; the tuned model is then
+evaluated on the held-out set with the same metrics and figures as step 13.
+"""
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -6,6 +13,7 @@ from sklearn.metrics import average_precision_score
 import optuna
 import shap
 from utils import *
+from benchmark_search_records import save_benchmark_search
 import warnings
 
 warnings.filterwarnings("ignore")
@@ -21,6 +29,8 @@ plt.rcParams["mathtext.bf"] = "Arial:bold"
 
 
 class LightGBMModel:
+    """Tune, fit and evaluate the LightGBM comparator."""
+
     def __init__(self, random_state=42):
         self.random_state = random_state
         self.model = None
@@ -193,6 +203,7 @@ class LightGBMModel:
             f"Best objective value: {best_trial.value:.6f} (Best AUC-PR: {best_trial.value:.6f})"
         )
 
+        save_benchmark_search(study, self.best_params, "LightGBM", self.random_state)
         return study
 
     def _params_list(self):
@@ -410,6 +421,7 @@ class LightGBMModel:
 
 
 def main():
+    """Tune, refit and evaluate the comparator on the training and held-out sets."""
     # Set the random seed.
     np.random.seed(42)
 

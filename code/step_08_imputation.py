@@ -1,3 +1,12 @@
+"""Step 08: time-aware imputation of missing predictors.
+
+Values are filled within each patient from the same or earlier visits where
+possible, and otherwise from training-set parameters stratified by visit stage
+and patient characteristics; the test set never contributes to fitted parameters.
+Imputation quality is checked against the observed distributions.
+Outputs: PPMI_7_train.csv and PPMI_7_test.csv.
+"""
+
 import pandas as pd
 import numpy as np
 from sklearn.experimental import enable_iterative_imputer

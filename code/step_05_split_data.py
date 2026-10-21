@@ -1,3 +1,9 @@
+"""Step 05: split patients into training and held-out evaluation sets.
+
+The split is stratified on a patient-level outcome label, so that all visits of a
+patient fall in the same set. Outputs: PPMI_5_train.csv and PPMI_5_test.csv.
+"""
+
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split

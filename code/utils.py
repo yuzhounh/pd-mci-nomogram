@@ -1,3 +1,10 @@
+"""Shared helpers for model evaluation and figures.
+
+Includes data loading, subject-level cross-validation, threshold selection,
+performance metrics, and the ROC/PR, SHAP, calibration, decision-curve and
+clinical-impact plots used by steps 13 and 14.
+"""
+
 import os
 import matplotlib.pyplot as plt
 import numpy as np
@@ -280,16 +287,6 @@ def plot_shap_summary(shap_values, X, feature_names, model_name, save_path):
 
     base_dir = os.path.dirname(save_path)
     base_name = os.path.splitext(os.path.basename(save_path))[0]
-
-    # # Bar plot
-    # fig = plt.figure(figsize=(10, 8))
-    # shap.summary_plot(
-    #     shap_values, X, feature_names=feature_names, plot_type="bar", show=False
-    # )
-    # plt.title(f"{model_name} - SHAP Feature Importance (Bar)")
-    # plt.tight_layout()
-    # save_figure(fig, os.path.join(base_dir, f"{base_name}_bar.pdf"))
-    # plt.close()
 
     # Summary plot
     fig = plt.figure(figsize=(10, 8))

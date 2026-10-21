@@ -1,3 +1,5 @@
+"""Step 02: summarise missing values of the initial candidate features."""
+
 import pandas as pd
 
 # Load the dataset

@@ -337,7 +337,7 @@ def get_variable_type(series: pd.Series, col_name: str) -> tuple[str, str]:
 def normality_test_single(arr: np.ndarray) -> tuple[float, str]:
     """
     Test normality in one group.
-    n ≤ 50 → Shapiro-Wilk；n > 50 → KS-Lilliefors
+    n ≤ 50 → Shapiro-Wilk; n > 50 → KS-Lilliefors
     Return (P value, test name).
     """
     n = len(arr)
@@ -790,7 +790,7 @@ def analyze_cohort(
     print(f"  Subjects: {n_subjects}")
     print(f"  Total visit records: {n_total}")
     for g, lab in zip(groups, group_labels):
-        print(f"  {lab}（{GROUP_COL}={g}）：{len(data[data[GROUP_COL] == g])}")
+        print(f"  {lab} ({GROUP_COL}={g}): {len(data[data[GROUP_COL] == g])}")
     print(f"Number of features to analyze: {len(feature_columns)}")
 
     # ── Step 1: Variable types and normality assessment. ──────────────────────────────
@@ -952,7 +952,7 @@ def analyze_cohort(
 
     # Print the Markdown table.
     print("\n\n" + "=" * 65)
-    print(f"【{cohort_name} Univariable Association & Characteristics Table】")
+    print(f"[{cohort_name} Univariable Association & Characteristics Table]")
     print("=" * 65 + "\n")
     print(markdown_table(results_df))
 
@@ -1077,7 +1077,7 @@ def summarize_main_table(
     )
 
     print("\n" + "=" * 65)
-    print("【Table 1 Content Preview】")
+    print("[Table 1 Content Preview]")
     print("=" * 65 + "\n")
     print(markdown_table(main_df))
 

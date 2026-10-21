@@ -23,7 +23,7 @@ The [`code/`](code/) directory contains the primary experiments reported in the 
 3. **Fit and compare models:** Fit the final unpenalized logistic regression and benchmark CatBoost, EasyEnsemble, LightGBM, tuned logistic regression, multilayer perceptron, random forest, support vector machine, and XGBoost models.
 4. **Evaluate and visualize:** Calculate patient-cluster-bootstrap confidence intervals, plot comparative ROC/PR curves, and generate the R nomogram from the full-precision final model coefficients.
 
-[`code/run_all.py`](code/run_all.py) runs an explicit manifest of 23 Python/R scripts and stops at the first failed step. [`code/utils.py`](code/utils.py) and [`code/figstyle.py`](code/figstyle.py) provide shared evaluation and plotting functions. The feature configuration CSV files define extraction, selection, and display names; they contain no participant-level observations.
+[`code/run_all.py`](code/run_all.py) runs an explicit manifest of 24 Python/R scripts (the last, step_17_validation_summary.py, adds reference/scaled Brier, calibration-in-the-large and net-benefit summaries from the saved validation predictions) and stops at the first failed step. [`code/utils.py`](code/utils.py) and [`code/figstyle.py`](code/figstyle.py) provide shared evaluation and plotting functions. The feature configuration CSV files define extraction, selection, and display names; they contain no participant-level observations.
 
 The public package contains the main experimental workflow and its required configuration. Sensitivity analyses, alternative analysis branches, presentation-only redraw scripts, manuscript build tools, and local review records are outside this package. Clustered bootstrap inference is part of the primary model evaluation.
 

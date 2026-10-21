@@ -1,3 +1,10 @@
+"""Step 14: CatBoost as a comparator model.
+
+Hyperparameters are tuned with Optuna (TPE sampler) to maximise mean AUPRC in
+patient-level cross-validation on the training set; the tuned model is then
+evaluated on the held-out set with the same metrics and figures as step 13.
+"""
+
 import json
 import numpy as np
 import pandas as pd
@@ -22,6 +29,8 @@ plt.rcParams["mathtext.bf"] = "Arial:bold"
 
 
 class CatBoostModel:
+    """Tune, fit and evaluate the CatBoost comparator."""
+
     def __init__(self, random_state=42):
         self.random_state = random_state
         self.model = None
@@ -391,6 +400,7 @@ class CatBoostModel:
 
 
 def main():
+    """Tune, refit and evaluate the comparator on the training and held-out sets."""
     # Set the random seed.
     np.random.seed(42)
 

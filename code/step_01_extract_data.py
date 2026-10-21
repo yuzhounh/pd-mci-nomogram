@@ -1,3 +1,10 @@
+"""Step 01: extract the PD cohort and the initial candidate features.
+
+Reads the PPMI curated data cut, checks the expected PD cohort size, harmonises
+renamed source columns, and writes the PD records and the selected candidate
+features (PPMI_0 to PPMI_3) for the following steps.
+"""
+
 import pandas as pd
 
 
@@ -16,6 +23,7 @@ SOURCE_COLUMN_ALIASES = {
 
 
 def normalize_source_columns(df):
+    """Rename source columns that changed between data cuts to the established names."""
     rename_map = {}
     for source_name, canonical_name in SOURCE_COLUMN_ALIASES.items():
         if source_name in df.columns and canonical_name in df.columns:
