@@ -1,3 +1,10 @@
+"""Step 04: apply the visit eligibility rules and recode the candidate features.
+
+Excludes visits without the PD-MCI outcome or with documented dementia, keeps
+the flagged features, applies clinical quality-control fixes and recodes binary
+variables. Output: PPMI_4_features.csv.
+"""
+
 import pandas as pd
 import numpy as np
 

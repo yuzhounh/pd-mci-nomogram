@@ -1,3 +1,10 @@
+"""Step 12: LASSO feature selection with the one-standard-error rule.
+
+The penalty is tuned by patient-level 10-fold cross-validation on AUPRC with
+standardisation fitted inside each fold. The selected predictors are written
+to PPMI_9_train.csv and PPMI_9_test.csv, with the coefficient paths and plots.
+"""
+
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import StratifiedGroupKFold, train_test_split

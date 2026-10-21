@@ -1,3 +1,10 @@
+"""Run the analysis pipeline in order, from data extraction to the nomogram.
+
+Each step is a separate script in this directory; Python steps run with the
+current interpreter and the R step with Rscript. Use --help for options such as
+starting from a given step.
+"""
+
 import argparse
 import glob
 import os
@@ -32,6 +39,7 @@ PIPELINE_MANIFEST = [
     ("Python", "step_14_bootstrap_ci.py"),
     ("Python", "step_15_plot_roc_pr_curves.py"),
     ("R", "step_16_nomogram.R"),
+    ("Python", "step_17_validation_summary.py"),
 ]
 
 
@@ -113,6 +121,7 @@ def run_script(script, runner_cmd, extra_args=None):
 
 
 def main():
+    """Parse the command line and run the selected pipeline steps."""
     # Use the script directory as the working directory.
     script_dir = os.path.dirname(os.path.abspath(__file__))
     if script_dir:
@@ -153,7 +162,7 @@ def main():
 
     print("=" * 60)
     print("PD-MCI Nomogram: Pipeline Runner")
-    print("Sequence: Strict numerical step order (step_01 to step_16)")
+    print("Sequence: Strict numerical step order (step_01 to step_17)")
     print("=" * 60)
 
     missing_scripts = [

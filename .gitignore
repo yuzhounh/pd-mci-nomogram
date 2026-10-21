@@ -9,5 +9,11 @@ tmp/
 code/PPMI_[0-9]*.csv
 code/PPMI_Curated_Data_Cut_Public_*.xlsx
 code/tables_all_*/
-code/step_13_lr_predictions.csv
-code/step_14_*_predictions.csv
+
+# Analysis outputs written by the pipeline (results are not distributed)
+code/step_*.csv
+code/step_*.json
+code/step_*.pdf
+code/step_*.tex
+code/*.log
+catboost_info/

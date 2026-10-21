@@ -33,7 +33,7 @@ python code/run_all.py --dry-run
 python code/run_all.py
 ```
 
-The runner changes to its own directory, executes an explicit 23-script Python/R manifest, and stops on the first failed step. It also supports `--python-only`, `--r-only`, `--start-from`, and `--skip`; later steps require outputs from earlier steps. The frozen full run took approximately 160 minutes, mainly because of the eight benchmark hyperparameter searches. Running the workflow writes intermediate datasets and results locally.
+The runner changes to its own directory, executes an explicit 24-script Python/R manifest, and stops on the first failed step. It also supports `--python-only`, `--r-only`, `--start-from`, and `--skip`; later steps require outputs from earlier steps. The frozen full run took approximately 160 minutes, mainly because of the eight benchmark hyperparameter searches. Running the workflow writes intermediate datasets and results locally.
 
 `utils.py` and `figstyle.py` provide shared evaluation and plotting functions. `model_parameters.json` is the single frozen six-predictor model artifact used by the analysis, R nomogram, and browser calculator. The repository-root `index.html` loads it directly from `code/model_parameters.json`. Re-running model fitting can overwrite this artifact; synchronize the calculator's embedded defaults when intentionally publishing a changed model. Bootstrap inference is part of the primary model evaluation, rather than an optional sensitivity-analysis branch.
 

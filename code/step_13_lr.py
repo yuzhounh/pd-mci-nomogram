@@ -1,3 +1,10 @@
+"""Step 13: final unpenalised logistic regression on the LASSO-selected predictors.
+
+Standard errors are clustered by patient. The script evaluates the model on the
+training and held-out sets, exports odds ratios, performance metrics and
+figures, and writes the model coefficients to model_parameters.json.
+"""
+
 import json
 import numpy as np
 import pandas as pd
@@ -23,6 +30,8 @@ plt.rcParams["mathtext.bf"] = "Arial:bold"
 
 
 class LRModel:
+    """Fit, evaluate and export the final logistic regression model."""
+
     def __init__(self, random_state=42):
         self.random_state = random_state
         self.model = None
@@ -693,6 +702,7 @@ class LRModel:
 
 
 def main():
+    """Fit the final model on the training set and evaluate it on the held-out set."""
     # Set the random seed.
     np.random.seed(42)
 

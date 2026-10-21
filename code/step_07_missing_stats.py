@@ -1,3 +1,5 @@
+"""Step 07: print the missing-value summary of the training set before imputation."""
+
 import pandas as pd
 
 # Read the CSV file.

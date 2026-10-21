@@ -1,3 +1,8 @@
+"""Step 11: drop helper and redundant columns before model selection.
+
+Outputs: PPMI_8_train.csv and PPMI_8_test.csv.
+"""
+
 import pandas as pd
 
 # Read training and test set data

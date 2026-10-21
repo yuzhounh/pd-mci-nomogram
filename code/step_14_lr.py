@@ -1,3 +1,10 @@
+"""Step 14: tuned logistic regression as a comparator model.
+
+Hyperparameters are tuned with Optuna (TPE sampler) to maximise mean AUPRC in
+patient-level cross-validation on the training set; the tuned model is then
+evaluated on the held-out set with the same metrics and figures as step 13.
+"""
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -23,6 +30,8 @@ plt.rcParams["mathtext.bf"] = "Arial:bold"
 
 
 class LRModel:
+    """Tune, fit and evaluate the penalised logistic regression comparator."""
+
     def __init__(self, random_state=42):
         self.random_state = random_state
         self.model = None
@@ -436,6 +445,7 @@ class LRModel:
 
 
 def main():
+    """Tune, refit and evaluate the comparator on the training and held-out sets."""
     # Set the random seed.
     np.random.seed(42)
 

@@ -1,3 +1,10 @@
+"""Step 06: derive disease duration at each visit.
+
+Missing age at diagnosis is filled with the training-set median, and missing age
+at onset with age at diagnosis minus the training-set median interval between
+onset and diagnosis. Outputs: PPMI_6_train.csv and PPMI_6_test.csv.
+"""
+
 import pandas as pd
 import numpy as np
 
