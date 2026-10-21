@@ -43,4 +43,4 @@ The outcome is the concurrent PPMI-derived operational cognitive-test PD-MCI ind
 
 Python files use Black formatting with an 88-character line target. Code comments, docstrings, terminal messages, warnings, and explanatory output labels are in English. Formatting and language changes were checked to preserve computational structure and interpolated expressions. The existing frozen analyses were not rerun for this presentation-only cleanup.
 
-Repository: [yuzhounh/PD-MCI-Nomogram](https://github.com/yuzhounh/PD-MCI-Nomogram).
+Repository: [yuzhounh/pd-mci-nomogram](https://github.com/yuzhounh/pd-mci-nomogram).

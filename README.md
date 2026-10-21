@@ -2,7 +2,7 @@
 
 Primary experimental code and an interactive web calculator for a six-predictor nomogram estimating the probability of concurrent mild cognitive impairment in Parkinson's disease (PD-MCI), using the PPMI-derived operational cognitive-test indicator.
 
-- **Use the calculator:** [Open the web calculator](https://yuzhounh.github.io/PD-MCI-Nomogram/).
+- **Use the calculator:** [Open the web calculator](https://yuzhounh.github.io/pd-mci-nomogram/).
 - **Explore the analysis:** [Main experimental code](code/).
 - **Reproduce the workflow:** [Detailed analysis instructions](code/README.md).
 
@@ -51,7 +51,7 @@ See [`code/README.md`](code/README.md) for the feature configuration, execution 
 
 ## Web calculator
 
-The [online calculator](https://yuzhounh.github.io/PD-MCI-Nomogram/) runs in the browser and requires no access to the PPMI dataset or installation of the analysis packages.
+The [online calculator](https://yuzhounh.github.io/pd-mci-nomogram/) runs in the browser and requires no access to the PPMI dataset or installation of the analysis packages.
 
 Enter all six predictors to view the estimated probability, its position relative to the selected threshold, and each predictor's signed contribution to the model linear predictor. The interface does not impute missing inputs. The three operating thresholds are:
 
@@ -76,7 +76,7 @@ Then open [http://localhost:8000/](http://localhost:8000/) in a browser. Serving
 ## Repository structure and GitHub Pages
 
 ```text
-PD-MCI-Nomogram/
+pd-mci-nomogram/
 ├── README.md                    # Project overview: analysis and calculator
 ├── LICENSE                      # MIT license
 ├── index.html                   # GitHub Pages calculator entry point
