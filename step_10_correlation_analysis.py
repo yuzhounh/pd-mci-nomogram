@@ -173,4 +173,24 @@ cax.tick_params(labelsize=fs.LEGEND_SIZE)
 ax.tick_params(axis="x", rotation=45)
 plt.setp(ax.get_xticklabels(), ha="right", rotation_mode="anchor")
 ax.tick_params(axis="y", rotation=0)
-fig.savefig("step_10_correlation_heatmap.pdf", bbox_inches="tight")
+# Normalize display labels after measuring the original canvas; preserve font sizes.
+fig.canvas.draw()
+bounds = fig.get_tightbbox(fig.canvas.get_renderer()).padded(plt.rcParams["savefig.pad_inches"])
+from matplotlib.transforms import Bbox
+bounds = Bbox.from_bounds(bounds.x0, bounds.y0, 343.7987365722656 / 72, 299.6855163574219 / 72)
+ax.set_xticklabels([fs.scale_label(label.get_text()) for label in ax.get_xticklabels()],
+                   rotation=45, ha="right", rotation_mode="anchor")
+ax.set_yticklabels([fs.scale_label(label.get_text()) for label in ax.get_yticklabels()], rotation=0)
+for _ in range(4):
+    fig.canvas.draw()
+    expanded = fig.get_tightbbox(fig.canvas.get_renderer()).padded(plt.rcParams["savefig.pad_inches"])
+    dx = max(0, bounds.x0 - expanded.x0) / fig.get_figwidth()
+    dy = max(0, bounds.y0 - expanded.y0) / fig.get_figheight()
+    if max(dx, dy) < 0.00001:break
+    position = ax.get_position()
+    ax.set_position([position.x0 + dx, position.y0 + dy,
+                     position.width - dx, position.height - dy])
+    fig.canvas.draw()
+    position = ax.get_position();bar_position = cax.get_position()
+    cax.set_position([bar_position.x0, position.y0, bar_position.width, position.height * 10 / 11])
+fig.savefig("step_10_correlation_heatmap.pdf", bbox_inches=bounds)

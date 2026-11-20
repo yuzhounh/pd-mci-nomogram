@@ -376,6 +376,67 @@ def extract_selected_features(
     return train_selected, test_selected
 
 
+def plot_feature_weights(results_df, output=FEATURE_WEIGHT_PDF):
+    """Redraw saved LASSO weights only; retain the original canvas and font sizes."""
+    fig, axes_grid = fs.axes_grid(1, 1, left=20.0, right=3.0)
+    ax = axes_grid[0, 0]
+    results_sorted = results_df.copy().sort_values("Weight", key=abs, ascending=True)
+    alphas = [0.95 if w > 0 else 0.75 for w in results_sorted["Weight"]]
+    colors = ["#3CADC4" if w > 0 else "#E64B35" for w in results_sorted["Weight"]]
+
+    # Plot bars with individual alpha values
+    for i, (weight, color, alpha) in enumerate(
+        zip(results_sorted["Weight"], colors, alphas)
+    ):
+        ax.barh(i, abs(weight), color=color, alpha=alpha)
+
+    ax.set_yticks(range(len(results_sorted)))
+    ax.set_yticklabels(results_sorted["Abbreviation"])
+    ax.set_xlabel("Weight")
+
+    # Adjust xlim
+    max_w = results_sorted["Weight"].abs().max() if not results_sorted.empty else 0.1
+    ax.set_xlim(0, max_w * 1.3)
+
+    for i, weight in enumerate(results_sorted["Weight"]):
+        ax.text(
+            abs(weight) + 0.005,
+            i,
+            f"{weight:.4f}",
+            ha="left",
+            va="center",
+            fontsize=fs.ANNOTATION_SIZE,
+        )
+
+    from matplotlib.patches import Patch
+
+    legend_elements = [
+        Patch(facecolor="#3CADC4", alpha=0.95, label="Positive"),
+        Patch(facecolor="#E64B35", alpha=0.75, label="Negative"),
+    ]
+    ax.legend(handles=legend_elements, loc="lower right")
+
+    ax.grid(axis="x", alpha=0.3, linestyle="--")
+    # Freeze the original canvas and font sizes while making room for the longer label.
+    fig.canvas.draw()
+    bounds = fig.get_tightbbox(fig.canvas.get_renderer()).padded(plt.rcParams["savefig.pad_inches"])
+    # Retain the physical PDF page size of the author-approved original plot.
+    from matplotlib.transforms import Bbox
+    bounds = Bbox.from_bounds(bounds.x0, bounds.y0,
+                              260.4944763183594 / 72, 187.08282470703125 / 72)
+    labels = [fs.scale_label(value) for value in results_sorted["Abbreviation"]]
+    ax.set_yticklabels(labels)
+    fig.canvas.draw()
+    expanded = fig.get_tightbbox(fig.canvas.get_renderer()).padded(plt.rcParams["savefig.pad_inches"])
+    shift = max(0, bounds.x0 - expanded.x0) / fig.get_figwidth()
+    if shift:
+        position = ax.get_position()
+        ax.set_position([position.x0 + shift, position.y0, position.width - shift, position.height])
+    fig.savefig(output, bbox_inches=bounds)
+    plt.close(fig)
+
+
+
 def main():
     """Main function"""
     # Load data
@@ -483,47 +544,7 @@ def main():
     results_df.to_csv(FEATURE_WEIGHT_CSV, index=False)
     print("\nSelected features:")
     print(results_df.to_string(index=False))
-    # Plot feature weight bar chart (Nature style)
-    fig, axes_grid = fs.axes_grid(1, 1, left=20.0, right=3.0)
-    ax = axes_grid[0, 0]
-    results_sorted = results_df.copy().sort_values("Weight", key=abs, ascending=True)
-    alphas = [0.95 if w > 0 else 0.75 for w in results_sorted["Weight"]]
-    colors = ["#3CADC4" if w > 0 else "#E64B35" for w in results_sorted["Weight"]]
-
-    # Plot bars with individual alpha values
-    for i, (weight, color, alpha) in enumerate(
-        zip(results_sorted["Weight"], colors, alphas)
-    ):
-        ax.barh(i, abs(weight), color=color, alpha=alpha)
-
-    ax.set_yticks(range(len(results_sorted)))
-    ax.set_yticklabels(results_sorted["Abbreviation"])
-    ax.set_xlabel("Weight")
-
-    # Adjust xlim
-    max_w = results_sorted["Weight"].abs().max() if not results_sorted.empty else 0.1
-    ax.set_xlim(0, max_w * 1.3)
-
-    for i, weight in enumerate(results_sorted["Weight"]):
-        ax.text(
-            abs(weight) + 0.005,
-            i,
-            f"{weight:.4f}",
-            ha="left",
-            va="center",
-            fontsize=fs.ANNOTATION_SIZE,
-        )
-
-    from matplotlib.patches import Patch
-
-    legend_elements = [
-        Patch(facecolor="#3CADC4", alpha=0.95, label="Positive"),
-        Patch(facecolor="#E64B35", alpha=0.75, label="Negative"),
-    ]
-    ax.legend(handles=legend_elements, loc="lower right")
-
-    ax.grid(axis="x", alpha=0.3, linestyle="--")
-    fig.savefig(FEATURE_WEIGHT_PDF, bbox_inches="tight")
+    plot_feature_weights(results_df)
 
     # Extract selected features (using original unscaled data)
     extract_selected_features(
@@ -538,4 +559,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+    if "--plot-only" in sys.argv:
+        plot_feature_weights(pd.read_csv(FEATURE_WEIGHT_CSV))
+    else:
+        main()

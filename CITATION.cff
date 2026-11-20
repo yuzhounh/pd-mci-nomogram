@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: "If you use this code or web calculator, please cite it as below."
+title: "pd-mci-nomogram: Analysis code and web calculator for predicting concurrent test-defined mild cognitive impairment in Parkinson's disease using non-cognitive predictors"
+type: software
+authors:
+  - family-names: Wang
+    given-names: Jing
+    orcid: "https://orcid.org/0000-0002-3286-073X"
+  - family-names: Chen
+    given-names: Yanfang
+  - family-names: Xia
+    given-names: Kunpeng
+  - family-names: Xie
+    given-names: Xiao
+  - family-names: Han
+    given-names: Hongfang
+  - family-names: Zhang
+    given-names: Li
+version: "1.0.0"
+date-released: "2026-11-20"
+license: MIT
+repository-code: "https://github.com/yuzhounh/pd-mci-nomogram"
+url: "https://yuzhounh.github.io/pd-mci-nomogram/"
+keywords:
+  - Parkinson's disease
+  - mild cognitive impairment
+  - nomogram
+  - clinical prediction model
+  - PPMI

@@ -193,7 +193,7 @@ class LRModel:
             "UPDRS-III": {
                 "min": 0,
                 "max": 132,
-                "description": "MDS-UPDRS Part III motor score (OFF state)",
+                "description": "MDS-UPDRS III motor score (OFF state)",
             },
         }
 
@@ -226,7 +226,7 @@ class LRModel:
                 "f1": round(float(getattr(self, "f1_median", 0.5)), 4),
             },
             "clinical_notes": {
-                "motor_assessment_state": "H&Y, MDS-UPDRS Part III, and PIGD use OFF-medication assessments in treated participants or assessments in untreated participants.",
+                "motor_assessment_state": "H&Y, MDS-UPDRS III, and PIGD use OFF-medication assessments in treated participants or assessments in untreated participants.",
                 "intended_use": "Point-of-care visit-level risk stratification aid for exploratory screening, not a standalone diagnostic confirmation.",
             },
             "scale_ranges": scale_metadata,

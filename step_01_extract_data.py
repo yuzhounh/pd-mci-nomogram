@@ -5,10 +5,33 @@ renamed source columns, and writes the PD records and the selected candidate
 features (PPMI_0 to PPMI_3) for the following steps.
 """
 
+import os
+from pathlib import Path
+
 import pandas as pd
 
 
-RAW_DATA_FILE = "PPMI_Curated_Data_Cut_Public_20260810.xlsx"
+RAW_DATA_FILENAME = "PPMI_Curated_Data_Cut_Public_20260810.xlsx"
+
+
+def resolve_raw_data_file():
+    """Locate the curated PPMI workbook from PPMI_DATA_DIR, data/raw/, or the repository root."""
+    candidates = []
+    env_dir = os.environ.get("PPMI_DATA_DIR")
+    if env_dir:
+        p = Path(env_dir).expanduser()
+        candidates.append(p if p.is_file() else p / RAW_DATA_FILENAME)
+    root = Path(__file__).resolve().parent
+    candidates.extend([root / "data" / "raw" / RAW_DATA_FILENAME, root / RAW_DATA_FILENAME])
+    for cand in candidates:
+        if cand.is_file():
+            return cand
+    raise FileNotFoundError(
+        f"{RAW_DATA_FILENAME} not found. Place it in data/raw/ or set PPMI_DATA_DIR."
+    )
+
+
+RAW_DATA_FILE = resolve_raw_data_file()
 EXPECTED_PD_COHORT = (8546, 1684)
 
 # The 2026-08-10 curated cut renamed four DATSCAN columns. Keep the established

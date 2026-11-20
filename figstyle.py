@@ -11,6 +11,7 @@ labels), text annotations 7, panel letters 11 (bold).
 
 from __future__ import annotations
 
+import re
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -20,6 +21,12 @@ AX_H = 52.0  # height of one axes frame in mm (aspect ratio 1.38)
 LEGEND_SIZE = 6.5
 ANNOTATION_SIZE = 7.0
 LETTER_SIZE = 11
+
+
+def scale_label(text: str) -> str:
+    """Use one display convention for all MDS-UPDRS subscale abbreviations."""
+    return re.sub(r'(?<!MDS-)(?:MDS-)?UPDRS(?:[-–− ]| Parts? )(IV|III|II|I)\b',
+                  lambda match: 'MDS-UPDRS ' + match.group(1), text)
 
 
 def apply() -> None:

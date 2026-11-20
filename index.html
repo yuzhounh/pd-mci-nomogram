@@ -611,7 +611,7 @@
 
                     <div class="form-group">
                         <label for="educ">Education (Years of Education)</label>
-                        <div class="hint">Observed training range: 4-20 years</div>
+                        <div class="hint">Observed training range: 4-20 years (capped at 20 in PPMI)</div>
                         <input type="number" id="educ" min="4" max="20" value="16" step="1">
                     </div>
 
@@ -619,27 +619,27 @@
 
                     <div class="form-group">
                         <label for="pigd">PIGD (Postural Instability/Gait Difficulty)</label>
-                        <div class="hint">Range: 0-4; OFF-medication or untreated assessment</div>
+                        <div class="hint">Range: 0-4 (5-item MDS-UPDRS mean); OFF-medication or untreated</div>
                         <input type="number" id="pigd" min="0" max="4" value="0.5" step="0.01">
                     </div>
 
                     <div class="form-group">
-                        <label for="updrs3">MDS-UPDRS-III (Motor Examination)</label>
+                        <label for="updrs3">MDS-UPDRS III (Motor Examination)</label>
                         <div class="hint">Training range: 0-95; OFF-medication or untreated</div>
                         <input type="number" id="updrs3" min="0" max="95" value="33" step="1">
                     </div>
 
                     <!-- Non-motor features. -->
                     <div class="form-group">
-                        <label for="gds">GDS (Geriatric Depression Scale)</label>
-                        <div class="hint">0-4 normal, 5-9 mild, ≥10 moderate-severe (0-15)</div>
+                        <label for="gds">GDS (15-Item Geriatric Depression Scale)</label>
+                        <div class="hint">GDS-15 (0-15): 0-4 normal, 5-9 mild, ≥10 moderate-severe</div>
                         <input type="number" id="gds" min="0" max="15" value="3" step="1">
                     </div>
 
                     <div class="form-group">
-                        <label for="nhy">H&amp;Y (Modified Hoehn and Yahr Stage)</label>
-                        <div class="hint">Training range: 0-5; OFF-medication or untreated</div>
-                        <input type="number" id="nhy" min="0" max="5" value="2" step="0.5">
+                        <label for="nhy">H&amp;Y (Hoehn and Yahr Stage)</label>
+                        <div class="hint">Integer stages 0-5; OFF-medication or untreated</div>
+                        <input type="number" id="nhy" min="0" max="5" value="2" step="1">
                     </div>
                 </div>
             </aside>
@@ -686,7 +686,7 @@
                                 </div>
                             </div>
                         </div>
-                        <p class="chart-intro">Variables are ordered by absolute contribution to the model's log-odds estimate.</p>
+                        <p class="chart-intro">Raw additive log-odds terms (&beta;<sub>j</sub> &times; x<sub>j</sub> relative to zero, not cohort-centered), ordered by absolute magnitude.</p>
                         <div class="chart-surface contribution-surface">
                             <svg id="contributionChart" viewBox="0 0 560 410" role="img" aria-label="Feature contribution horizontal bar chart"></svg>
                         </div>
@@ -751,11 +751,11 @@
 
     <script>
         // ============ Model Parameters ============
-        // Loaded dynamically from code/model_parameters.json, with embedded defaults
+        // Loaded dynamically from model_parameters.json, with embedded defaults
         const MODEL = {
             coef: [0.631115501191589, -0.12452162649225493, 0.09415084311559398, 0.2988041285311768, 0.20987849643648598, 0.019406185418798863],
             intercept: -1.4953604775736613,
-            names: ["Sex", "Education", "GDS", "H&Y", "PIGD", "UPDRS-III"],
+            names: ["Sex", "Education", "GDS", "H&Y", "PIGD", "MDS-UPDRS III"],
             thr: { default: 0.5, f1: 0.1977, youden: 0.1966 }
         };
 
@@ -910,7 +910,7 @@
             svg.innerHTML = `
                 <text x="332" y="28" text-anchor="middle" fill="#64748b" font-size="12.5" font-weight="700">ABSOLUTE CONTRIBUTION MAGNITUDE</text>
                 <line x1="${baselineX}" y1="52" x2="${baselineX}" y2="354" stroke="#94a3b8" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
-                <text x="332" y="394" text-anchor="middle" fill="#64748b" font-size="13" font-weight="600">Bar length = absolute contribution to model log-odds</text>
+                <text x="332" y="394" text-anchor="middle" fill="#64748b" font-size="13" font-weight="600">Bar length = |β × x| (raw additive log-odds term relative to zero)</text>
                 ${rows}
             `;
         }
@@ -1013,7 +1013,7 @@
         // Dynamically load model parameters from JSON if available
         async function loadModelParameters() {
             try {
-                const res = await fetch('code/model_parameters.json');
+                const res = await fetch('model_parameters.json');
                 if (res.ok) {
                     const data = await res.json();
                     if (data && data.coefficients) {
@@ -1026,7 +1026,7 @@
                             data.coefficients.pigd,
                             data.coefficients.updrs3_score
                         ];
-                        MODEL.names = data.feature_order || ["Sex", "Education", "GDS", "H&Y", "PIGD", "UPDRS-III"];
+                        MODEL.names = (data.feature_order || ["Sex", "Education", "GDS", "H&Y", "PIGD", "MDS-UPDRS III"]).map(v => v === "UPDRS-III" ? "MDS-UPDRS III" : v);
                         if (data.thresholds) {
                             MODEL.thr.default = data.thresholds.default ?? 0.5;
                             MODEL.thr.youden = data.thresholds.youden ?? 0.1966;

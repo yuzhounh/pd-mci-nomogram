@@ -4,11 +4,15 @@
 library(rms)
 library(jsonlite)
 
+plot_only <- "--plot-only" %in% commandArgs(trailingOnly = TRUE)
+
 # Read the training data.
 train_data <- read.csv("PPMI_9_train.csv")
 
 # Read the feature mapping as the sole source for original names and abbreviations.
-feature_mapping <- read.csv("PPMI_feature_mapping.csv")
+feature_mapping <- read.csv("PPMI_feature_mapping.csv", encoding = "UTF-8",
+                            check.names = FALSE)
+names(feature_mapping)[1] <- "feature"  # Strip the optional UTF-8 BOM from the key header.
 abbr_lut <- setNames(
   as.character(feature_mapping$abbreviation), feature_mapping$feature
 )
@@ -50,7 +54,27 @@ message(sprintf(
 
 # Build a dynamic logistic-regression formula, escaping hyphenated abbreviations with backticks.
 formula_str <- paste("MCI ~", paste(sprintf("`%s`", pred_vars), collapse = " + "))
-fit <- lrm(as.formula(formula_str), data = train_data_mapped, x = TRUE, y = TRUE)
+if (plot_only) {
+  # Construct rms plotting metadata without fitting or changing the saved model.
+  frame <- lrm(as.formula(formula_str), data = train_data_mapped,
+               method = "model.frame")
+  design <- attr(frame, "Design")
+  terms <- attr(frame, "terms")
+  attr(terms, "formula") <- as.formula(formula_str)
+  fit <- list(Design = design, terms = terms,
+              sformula = attr(frame, "sformula"),
+              coefficients = setNames(rep(0, 1 + length(pred_vars)),
+                                      c("Intercept", design$colnames)),
+              # predictrms requests covariance metadata even with se.fit=FALSE.
+              # It is unavailable in this redraw-only object; no CIs are plotted.
+              var = matrix(NA_real_, 1 + length(pred_vars), 1 + length(pred_vars)),
+              non.slopes = 1, interceptRef = 1, center = 0,
+              scale.pred = c("log odds", "Odds Ratio"),
+              assign = rms::DesignAssign(design, 1, terms))
+  class(fit) <- c("lrm", "rms", "glm")
+} else {
+  fit <- lrm(as.formula(formula_str), data = train_data_mapped, x = TRUE, y = TRUE)
+}
 
 # Replace lrm coefficients with the full-precision coefficients from model_parameters.json.
 # Only coefficients are replaced; fit$var (covariance), fit$stats, and fit$linear.predictors
@@ -70,6 +94,10 @@ for (nm in names(new_coefs)) {
   new_coefs[nm] <- coef_raw[clean_nm]
 }
 fit$coefficients <- new_coefs
+# Display-name correction only; predictor keys and frozen coefficients stay intact.
+# The PDF device's ISOLatin1 encoding maps ASCII '-' to a minus glyph.
+# Its soft-hyphen slot prints a true hyphen, without altering negative axis signs.
+fit$Design$label[fit$Design$name == to_abbr("updrs3_score")] <- "MDS\u00adUPDRS III"
 
 # Verify that all coefficients have been replaced and none are missing.
 stopifnot(
@@ -81,8 +109,9 @@ stopifnot(
 nomo <- nomogram(
   fit,
   GDS = seq(0, 15, by = 3),
+  lp.at = seq(-3.5, 2.5, by = 0.5),
   fun = plogis,
-  fun.at = c(0.01, 0.05, seq(0.1, 0.9, 0.1), 0.95, 0.99),
+  fun.at = c(0.05, seq(0.1, 0.9, 0.1)),
   funlabel = "Risk of PD-MCI"
 )
 
@@ -99,5 +128,8 @@ if (Sys.which("pdfcrop") != "") {
   system2("pdfcrop", c(pdf_path, pdf_path))
 }
 
-# Optional presentation pass matching the Milestones label-column spacing:
-# python compact_nomogram_labels.py
+# Retain the author-approved label-column spacing in every redraw.
+python <- Sys.getenv("E01_PYTHON", unset = Sys.which("python"))
+if (!nzchar(python)) stop("Python is required for the approved nomogram label spacing")
+status <- system2(python, "compact_nomogram_labels.py")
+if (status != 0) stop("Nomogram label-spacing pass failed")

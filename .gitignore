@@ -1,19 +1,22 @@
-# Local runtime files
+# Python caches and local environments
 __pycache__/
 *.py[cod]
 .venv/
 venv/
 tmp/
+.env
 
 # Restricted PPMI data and participant/visit-level derivatives
-code/PPMI_[0-9]*.csv
-code/PPMI_Curated_Data_Cut_Public_*.xlsx
-code/tables_all_*/
+data/raw/
+data/derived/
+PPMI_[0-9]*.csv
+PPMI_Curated_Data_Cut_Public_*.xlsx
+tables_all_*/
 
-# Analysis outputs written by the pipeline (results are not distributed)
-code/step_*.csv
-code/step_*.json
-code/step_*.pdf
-code/step_*.tex
-code/*.log
+# Analysis outputs written by the pipeline
+step_*.csv
+step_*.json
+step_*.pdf
+step_*.tex
+*.log
 catboost_info/
