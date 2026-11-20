@@ -473,7 +473,10 @@
         }
 
         .threshold-item strong {
-            display: block;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
             color: #1e293b;
             font-size: 0.95em;
             font-weight: 600;
@@ -491,13 +494,10 @@
             line-height: 1.4;
         }
 
-        /* Active selection checkmark using standard inline SVG */
-        .threshold-item.active::after {
+        /* Active selection checkmark aligned on the right of the title row */
+        .threshold-item.active strong::after {
             content: "";
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
+            flex-shrink: 0;
             width: 18px;
             height: 18px;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232b6cb0' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
@@ -826,6 +826,41 @@
             };
         }
 
+        function roundedGaugeRingPath(centerX, centerY, radius, thickness, cornerRadius) {
+            const outerR = radius + thickness / 2;
+            const innerR = radius - thickness / 2;
+            const r = Math.min(cornerRadius, thickness / 2 - 0.5);
+            const dxOut = Math.sqrt((outerR - r) * (outerR - r) - r * r);
+            const dxIn = Math.sqrt((innerR + r) * (innerR + r) - r * r);
+            const outScale = outerR / (outerR - r);
+            const inScale = innerR / (innerR + r);
+
+            const lBotOutX = centerX - dxOut;
+            const rBotOutX = centerX + dxOut;
+            const lBotInX = centerX - dxIn;
+            const rBotInX = centerX + dxIn;
+
+            const lArcOutX = centerX - dxOut * outScale;
+            const rArcOutX = centerX + dxOut * outScale;
+            const arcOutY = centerY - r * outScale;
+
+            const lArcInX = centerX - dxIn * inScale;
+            const rArcInX = centerX + dxIn * inScale;
+            const arcInY = centerY - r * inScale;
+
+            return [
+                `M ${lBotOutX.toFixed(3)} ${centerY}`,
+                `A ${r} ${r} 0 0 1 ${lArcOutX.toFixed(3)} ${arcOutY.toFixed(3)}`,
+                `A ${outerR} ${outerR} 0 0 1 ${rArcOutX.toFixed(3)} ${arcOutY.toFixed(3)}`,
+                `A ${r} ${r} 0 0 1 ${rBotOutX.toFixed(3)} ${centerY}`,
+                `L ${rBotInX.toFixed(3)} ${centerY}`,
+                `A ${r} ${r} 0 0 1 ${rArcInX.toFixed(3)} ${arcInY.toFixed(3)}`,
+                `A ${innerR} ${innerR} 0 0 0 ${lArcInX.toFixed(3)} ${arcInY.toFixed(3)}`,
+                `A ${r} ${r} 0 0 1 ${lBotInX.toFixed(3)} ${centerY}`,
+                'Z'
+            ].join(' ');
+        }
+
         // Draw a responsive vector gauge with dynamic threshold segmentation
         function drawGauge(probability) {
             const svg = document.getElementById('gaugeChart');
@@ -834,12 +869,23 @@
             const centerX = 230;
             const centerY = 222;
             const radius = 184;
-            const arcPath = `M ${centerX - radius} ${centerY} A ${radius} ${radius} 0 0 1 ${centerX + radius} ${centerY}`;
+            const ringWidth = 30;
+            const cornerRadius = 8;
+            const ringPath = roundedGaugeRingPath(centerX, centerY, radius, ringWidth, cornerRadius);
+            const wedgeR = radius + ringWidth;
+            const startAngle = Math.PI - 0.12;
+            const thrAngle = Math.PI + thrValue * Math.PI;
+            const startX = centerX + wedgeR * Math.cos(startAngle);
+            const startY = centerY + wedgeR * Math.sin(startAngle);
+            const thrEndX = centerX + wedgeR * Math.cos(thrAngle);
+            const thrEndY = centerY + wedgeR * Math.sin(thrAngle);
+            const largeArc = (thrAngle - startAngle) > Math.PI ? 1 : 0;
+            const greenSector = thrValue <= 0 ? '' : (thrValue >= 1
+                ? `<path d="${ringPath}" fill="#86d7ad"/>`
+                : `<path d="M ${centerX} ${centerY} L ${startX.toFixed(3)} ${startY.toFixed(3)} A ${wedgeR} ${wedgeR} 0 ${largeArc} 1 ${thrEndX.toFixed(3)} ${thrEndY.toFixed(3)} Z" fill="#86d7ad" clip-path="url(#gaugeRingClip)"/>`);
             const probabilityPoint = polarPoint(centerX, centerY, radius, safeProbability);
             const thresholdInner = polarPoint(centerX, centerY, radius - 22, thrValue);
             const thresholdOuter = polarPoint(centerX, centerY, radius + 22, thrValue);
-            const greenLength = thrValue * 100;
-            const aboveThresholdLength = 100 - greenLength;
             const probabilityPercent = (safeProbability * 100).toFixed(1);
             const thresholdPercent = (thrValue * 100).toFixed(1);
 
@@ -849,19 +895,19 @@
                     <filter id="gaugeDotShadow" x="-100%" y="-100%" width="300%" height="300%">
                         <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#1e3a8a" flood-opacity="0.20"/>
                     </filter>
+                    <clipPath id="gaugeRingClip">
+                        <path d="${ringPath}"/>
+                    </clipPath>
                 </defs>
-                <path d="${arcPath}" pathLength="100" fill="none" stroke="#e8eef5" stroke-width="30" stroke-linecap="round"/>
-                <path d="${arcPath}" pathLength="100" fill="none" stroke="#86d7ad" stroke-width="30"
-                    stroke-dasharray="${greenLength} ${100 - greenLength}"/>
-                <path d="${arcPath}" pathLength="100" fill="none" stroke="#f2a5a5" stroke-width="30"
-                    stroke-dasharray="${aboveThresholdLength} ${greenLength}" stroke-dashoffset="${-greenLength}"/>
+                <path d="${ringPath}" fill="#f2a5a5"/>
+                ${greenSector}
                 <line x1="${thresholdInner.x}" y1="${thresholdInner.y}" x2="${thresholdOuter.x}" y2="${thresholdOuter.y}"
                     stroke="#dc2626" stroke-width="3" stroke-linecap="round"/>
                 <circle cx="${probabilityPoint.x}" cy="${probabilityPoint.y}" r="10" fill="#2563eb" stroke="#ffffff"
                     stroke-width="5" filter="url(#gaugeDotShadow)"/>
-                <text x="46" y="253" fill="#64748b" font-size="15" font-weight="650">0%</text>
+                <text x="46" y="248" fill="#64748b" font-size="15" font-weight="650" text-anchor="middle">0%</text>
                 <text x="230" y="20" fill="#64748b" font-size="15" font-weight="650" text-anchor="middle">50%</text>
-                <text x="414" y="253" fill="#64748b" font-size="15" font-weight="650" text-anchor="end">100%</text>
+                <text x="414" y="248" fill="#64748b" font-size="15" font-weight="650" text-anchor="middle">100%</text>
                 <text id="probabilityValue" x="230" y="168" fill="#0f172a" font-size="50" font-weight="750"
                     text-anchor="middle" letter-spacing="-1">${probabilityPercent}%</text>
                 <text x="230" y="195" fill="#64748b" font-size="15" font-weight="500" text-anchor="middle">PD-MCI probability</text>
